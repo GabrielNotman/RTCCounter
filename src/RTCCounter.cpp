@@ -14,8 +14,6 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
-#include <time.h>
-
 #include "RTCCounter.h"
 
 #define EPOCH_TIME_OFF      946684800  // This is 1st January 2000, 00:00:00 in epoch time

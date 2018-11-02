@@ -18,7 +18,6 @@
 #define RTC_COUNTER_H
 
 #include "Arduino.h"
-#include <time.h>
 
 typedef void(*voidFuncPtr)(void);
 
