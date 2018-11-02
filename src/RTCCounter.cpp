@@ -67,21 +67,20 @@ void RTCCounter::begin(bool resetTime)
   
   RTC->MODE0.READREQ.reg &= ~RTC_READREQ_RCONT; // disable continuously mode
 
-  RTC->MODE0.CTRL.reg = tmp_reg;
   while (RTCisSyncing());
-
+  RTC->MODE0.CTRL.reg = tmp_reg;
+  
   NVIC_EnableIRQ(RTC_IRQn); // enable RTC interrupt 
-  NVIC_SetPriority(RTC_IRQn, 0x00);
+  NVIC_SetPriority(RTC_IRQn, 0x03);
 
   RTCenable();
-  RTCresetRemove();
 
   // If desired and valid, restore the time value, else use first valid time value
   if ((!resetTime) && (validTime)) {
+    while (RTCisSyncing());
     RTC->MODE0.COUNT.reg = oldTime;
   }
-  while (RTCisSyncing());
-
+  
   _configured = true;
 }
 
@@ -128,9 +127,10 @@ void RTCCounter::setAlarmEpoch(uint32_t epoch)
 void RTCCounter::setAlarmY2kEpoch(uint32_t y2kEpoch)
 {
   if (_configured) {
-    RTC->MODE0.COMP[0].reg = y2kEpoch;
-    RTC->MODE0.INTENSET.bit.CMP0 = 1;
     while (RTCisSyncing());
+    RTC->MODE0.COMP[0].reg = y2kEpoch;
+
+    RTC->MODE0.INTENSET.bit.CMP0 = 1;
   }
 }
 
@@ -177,7 +177,6 @@ void RTCCounter::disableAlarm()
 {
   if (_configured) {
     RTC->MODE0.INTENCLR.bit.CMP0 = 1;
-    while (RTCisSyncing());
 
     _periodic = false;
     _alarmPeriod = 0;
@@ -204,6 +203,8 @@ uint32_t RTCCounter::getY2kEpoch()
   
   if (_configured) {
     RTCreadRequest();
+
+    while (RTCisSyncing());
     y2kEpochTime = RTC->MODE0.COUNT.reg;
   }
 
@@ -228,8 +229,12 @@ void RTCCounter::setEpoch(uint32_t epoch)
 void RTCCounter::setY2kEpoch(uint32_t y2kEpoch)
 {
   if (_configured) {
-    RTC->MODE0.COUNT.reg = y2kEpoch;
-    while (RTCisSyncing());
+      while (RTCisSyncing());
+      RTC->MODE0.COUNT.reg = y2kEpoch;
+  }
+
+  if (_periodic) {
+      setPeriodicAlarm(_alarmPeriod, 0);
   }
 }
 
@@ -262,8 +267,8 @@ void RTCCounter::config32kOSC()
 
 inline void RTCCounter::RTCreadRequest() {
   if (_configured) {
-    RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ; // request a read update
     while (RTCisSyncing());
+    RTC->MODE0.READREQ.reg = RTC_READREQ_RREQ; // request a read update
   }
 }
 
@@ -274,26 +279,20 @@ inline bool RTCCounter::RTCisSyncing()
 
 void RTCCounter::RTCdisable()
 {
-  RTC->MODE0.CTRL.reg &= ~RTC_MODE0_CTRL_ENABLE; // disable RTC
   while (RTCisSyncing());
+  RTC->MODE0.CTRL.reg &= ~RTC_MODE0_CTRL_ENABLE; // disable RTC
 }
 
 void RTCCounter::RTCenable()
 {
-  RTC->MODE0.CTRL.reg |= RTC_MODE0_CTRL_ENABLE; // enable RTC
   while (RTCisSyncing());
+  RTC->MODE0.CTRL.reg |= RTC_MODE0_CTRL_ENABLE; // enable RTC
 }
 
 void RTCCounter::RTCreset()
 {
+  while (RTCisSyncing());
   RTC->MODE0.CTRL.reg |= RTC_MODE0_CTRL_SWRST; // software reset
-  while (RTCisSyncing());
-}
-
-void RTCCounter::RTCresetRemove()
-{
-  RTC->MODE0.CTRL.reg &= ~RTC_MODE0_CTRL_SWRST; // software reset remove
-  while (RTCisSyncing());
 }
 
 void RTCCounter::IrqHandler()
@@ -301,15 +300,15 @@ void RTCCounter::IrqHandler()
   _intFlag = true;
 
   if (_periodic) {
-    uint32_t nextAlarm = getAlarmY2kEpoch() + _alarmPeriod;
-    setAlarmY2kEpoch(nextAlarm);
+    while (RTCisSyncing());
+    RTC->MODE0.COMP[0].reg += _alarmPeriod;
   }
-  
+
+  RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
+
   if (_callBack != NULL) {
     _callBack();
   }
-
-  RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0; // must clear flag at end
 }
 
 /*
