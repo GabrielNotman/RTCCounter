@@ -302,6 +302,10 @@ void RTCCounter::IrqHandler()
   if (_periodic) {
     while (RTCisSyncing());
     RTC->MODE0.COMP[0].reg += _alarmPeriod;
+
+    // For safety we will wait until the write sync
+    // has completed, this takes 5-6ms
+    while (RTCisSyncing());
   }
 
   RTC->MODE0.INTFLAG.reg = RTC_MODE0_INTFLAG_CMP0;
