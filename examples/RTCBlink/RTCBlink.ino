@@ -1,3 +1,15 @@
+/*
+ * RTC Counter Periodic Blink example
+ * Created by Gabriel Notman
+ *
+ * This example demonstrates how to use the RTC Counter
+ * library for simple periodic events.
+ *
+ * This example code is in the public domain.
+ * 
+ * Created 05 November 2018
+ */
+
 #include <RTCCounter.h>
 
 void setup()

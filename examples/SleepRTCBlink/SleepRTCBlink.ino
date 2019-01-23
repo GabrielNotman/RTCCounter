@@ -1,9 +1,22 @@
+/*
+ * RTC Counter Periodic Wakeup example
+ * Created by Gabriel Notman
+ *
+ * This example demonstrates how to use the RTC Counter
+ * library to periodically wake the board from deep sleep.
+ *
+ * This example code is in the public domain.
+ * 
+ * Created 05 November 2018
+ */
+
+
 #include <RTCCounter.h>
 
 void setup()
 {
   // Sleep mode can intefere with reprogramming.
-  // A startup delay makes it a easier as it
+  // A startup delay makes things easier as it
   // provides a window to upload new code
   delay(5000);
   

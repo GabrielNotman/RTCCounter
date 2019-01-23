@@ -1,3 +1,15 @@
+/*
+ * RTC Counter Date Time example
+ * Created by Gabriel Notman
+ *
+ * This example demonstrates how to use the RTC Counter
+ * library for date and time functions.
+ *
+ * This example code is in the public domain.
+ * 
+ * Created 05 November 2018
+ */
+
 #include <RTCCounter.h>
 #include <time.h>
 
@@ -30,7 +42,7 @@ void loop()
 void setDateTime(uint16_t year, uint8_t month, uint8_t day, 
   uint8_t hour, uint8_t minute, uint8_t second)
 {
-  // Use the tm struct to convert the parameters to and epoch
+  // Use the tm struct to convert the parameters to and from an epoch value
   struct tm tm;
 
   tm.tm_isdst = -1;
