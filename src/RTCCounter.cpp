@@ -221,7 +221,7 @@ void RTCCounter::setEpoch(uint32_t epoch)
       setY2kEpoch(epoch - EPOCH_TIME_OFF);
     }
     else {
-      setAlarmY2kEpoch(0);
+      setY2kEpoch(0);
     }
   }
 }
