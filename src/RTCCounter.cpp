@@ -96,7 +96,7 @@ bool RTCCounter::getFlag()
 
 void RTCCounter::clearFlag()
 {
-    _intFlag = false;
+  _intFlag = false;
 }
 
 void RTCCounter::attachInterrupt(voidFuncPtr callback)
@@ -233,12 +233,12 @@ void RTCCounter::setEpoch(uint32_t epoch)
 void RTCCounter::setY2kEpoch(uint32_t y2kEpoch)
 {
   if (_configured) {
-      while (RTCisSyncing());
-      RTC->MODE0.COUNT.reg = y2kEpoch;
+    while (RTCisSyncing());
+    RTC->MODE0.COUNT.reg = y2kEpoch;
   }
 
   if (_periodic) {
-      setPeriodicAlarm(_alarmPeriod, 0);
+    setPeriodicAlarm(_alarmPeriod, 0);
   }
 }
 
@@ -327,7 +327,7 @@ RTCCounter rtcCounter;
 /*
  * RTC ISR
  */
- void RTC_Handler(void)
+void RTC_Handler(void)
 {
   rtcCounter.IrqHandler();
 }
