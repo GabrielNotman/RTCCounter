@@ -148,9 +148,13 @@ void RTCCounter::setPeriodicAlarm(uint32_t period, uint32_t offset)
 
 uint32_t RTCCounter::getAlarmEpoch()
 {
+  uint32_t alarm = 0;
+    
   if (_configured) {
-    return getAlarmY2kEpoch() + EPOCH_TIME_OFF;
+    alarm = getAlarmY2kEpoch() + EPOCH_TIME_OFF;
   }
+  
+  return alarm;
 }
 
 uint32_t RTCCounter::getAlarmY2kEpoch()
